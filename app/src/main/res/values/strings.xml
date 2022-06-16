@@ -16,9 +16,11 @@
     <string name="menu_slideshow">Slideshow</string>
 
     <string name="name_placeholder">Nombre del lugar ...</string>
-    <string name="create_place">Agregar el lugar</string>
+    <string name="create_place">Agregar lugar</string>
+    <string name="update_place">Actualizar lugar</string>
 
     <string name="msg_lugar_added">El lugar ha sido agregado</string>
+    <string name="msg_lugar_updated">El lugar ha sido actualizado</string>
     <string name="msg_error">No se agregó el lugar</string>
 
 
