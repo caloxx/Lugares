@@ -1,6 +1,10 @@
 package com.example.lugares.ui.lugar
 
+import android.Manifest
 import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -9,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.lugares.R
-import com.example.lugares.databinding.FragmentAddLugarBinding
 import com.example.lugares.databinding.FragmentUpdateLugarBinding
 import com.example.lugares.model.Lugar
 import com.example.lugares.viewmodel.LugarViewModel
@@ -43,6 +46,21 @@ class UpdateLugarFragment : Fragment() {
         binding.lugarName.setText(args.lugar.nombre)
 
         binding.finalAddLugarBtn.setOnClickListener { updateLugar() }
+
+        //binding.tvAltura.text=args.lugar.altura.toString()
+        binding.tvAltura.text="1250 pies"
+
+        //binding.tvLatitud.text=args.lugar.latitud.toString()
+        binding.tvLatitud.text="9°55′57″N"
+
+        //binding.tvLongitud.text=args.lugar.longitud.toString()
+        binding.tvLongitud.text="84°04′48″O"
+
+        binding.emailBtn.setOnClickListener { escribirCorreo() }
+        binding.phoneBtn.setOnClickListener { llamarLugar() }
+        binding.whatsBtn.setOnClickListener { enviarWhatsApp() }
+        binding.webBtn.setOnClickListener { verWebLugar() }
+        binding.locationBtn.setOnClickListener { verMapa() }
 
         setHasOptionsMenu(true)
 
@@ -88,6 +106,97 @@ class UpdateLugarFragment : Fragment() {
         builder.setTitle(R.string.deleted)
         builder.setMessage(getString(R.string.seguroBorrar) + " ${args.lugar.nombre}?")
         builder.create().show()
+    }
+
+    private fun llamarLugar() {
+        //val telefono = binding.phone.text
+        val telefono = "11223344"
+
+        if (telefono.isNotEmpty()) {
+
+            val dialIntent = Intent(Intent.ACTION_CALL)
+            dialIntent.data = Uri.parse("tel:$telefono")
+
+            if (requireActivity().checkSelfPermission(Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+                requireActivity().requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), 105)
+            } else {
+                requireActivity().startActivity(dialIntent)
+            }
+
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.msg_datos), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun escribirCorreo() {
+        //val para = binding.email.text.toString()
+        val para = "andresnboza92@gmail.com"
+
+        if (para.isNotEmpty()) {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "message/rfc822"
+            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(para))
+            intent.putExtra(
+                Intent.EXTRA_SUBJECT, getString(R.string.msg_saludos) + " " + binding.lugarName.text
+            )
+            intent.putExtra(
+                Intent.EXTRA_TEXT, getString(R.string.msg_mensaje_correo)
+            )
+            startActivity(intent)
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.msg_datos), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun enviarWhatsApp() {
+        //val telefono = binding.phone.text
+        val telefono = "11223344"
+
+        if (telefono.isNotEmpty()) {
+
+            val sendIntent = Intent(Intent.ACTION_VIEW)
+            val uri = "whatsapp://send?phone=506$telefono&text=" + getString(R.string.msg_saludos)
+
+            sendIntent.setPackage("com.whatsapp")
+            sendIntent.data = Uri.parse(uri)
+            startActivity(sendIntent)
+
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.msg_datos), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun verWebLugar() {
+        //val sitio = binding.webPage.text
+        val sitio = "www.nacion.com"
+
+        if (sitio.isNotEmpty()) {
+
+            val webPage = Uri.parse("https://$sitio")
+            val intent = Intent(Intent.ACTION_VIEW, webPage)
+            startActivity(intent)
+
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.msg_datos), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun verMapa() {
+        //val latitud = binding.latitud.text.toString().toDouble()
+        val latitud = 1.23445
+        //val longitud = binding.longitud.text.toString().toDouble()
+        val longitud = 1.23445
+
+        if (latitud.isFinite() && longitud.isFinite()) {
+
+            val location = Uri.parse("geo:$latitud,$longitud?z=18")
+            val mapIntent = Intent(Intent.ACTION_VIEW, location)
+            startActivity(mapIntent)
+
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.msg_datos), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun validation (nombre: String): Boolean {

@@ -1,17 +1,23 @@
 package com.example.lugares.ui.lugar
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.lugares.R
 import com.example.lugares.databinding.FragmentAddLugarBinding
 import com.example.lugares.model.Lugar
 import com.example.lugares.viewmodel.LugarViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -40,7 +46,40 @@ class AddLugarFragment : Fragment() {
 
         binding.finalAddLugarBtn.setOnClickListener { addLugar() }
 
+        ubicaGPS()
+
         return binding.root
+    }
+
+    private fun ubicaGPS() {
+        val fusedLocationClient: FusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())
+
+        val conPermisos = true
+
+        if (ActivityCompat.checkSelfPermission(requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(requireContext(),
+            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ), 105)
+        }
+
+        if (conPermisos) { fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    binding.tvLatitud.text = "${location.latitude}"
+                    binding.tvLongitud.text = "${location.longitude}"
+                    binding.tvAltura.text = "${location.altitude}"
+                } else {
+                    binding.tvLatitud.text = getString(R.string.error)
+                    binding.tvLongitud.text = getString(R.string.error)
+                    binding.tvAltura.text = getString(R.string.error)
+                }
+            }
+        }
+
     }
 
     private fun addLugar() {
